@@ -9,48 +9,110 @@
 
 /* ───────────────────────────────────────────────────────────────
    1. AUDIO MANAGER
+   Uses a plain <audio> element for background music (reliable
+   autoplay/loop across all browsers & file:// protocol) and
+   Web Audio API for SFX. Mute state persists in sessionStorage.
 ──────────────────────────────────────────────────────────────── */
 const AudioManager = (() => {
-  let ctx = null, bgMusic = null, bgGain = null, sfxGain = null;
-  let unlocked = false;
-  const buffers = {};
+  /* ── Background music via <audio> element ── */
+  const bgEl = document.createElement('audio');
+  bgEl.src    = 'assets/audio/background.mp3';
+  bgEl.loop   = true;
+  bgEl.volume = 1;
+  bgEl.preload = 'auto';
+  document.body.appendChild(bgEl);
 
+  /* ── SFX via Web Audio API ── */
+  let ctx     = null;
+  let sfxGain = null;
+  const sfxBufs = {};
+  let sfxReady  = false;
+
+  /* ── Mute state ── */
+  let muted = false;
+
+  /* ── Mute button reference (injected into DOM on init) ── */
+  let muteBtn = null;
+
+  /* Called on first user gesture — starts BG music & inits SFX */
   function unlock() {
-    if (unlocked) return;
+    /* Start background music */
+    bgEl.play().catch(() => { /* blocked by browser — user hasn't interacted yet */ });
+
+    /* Init Web Audio for SFX */
+    if (sfxReady) return;
     try {
-      ctx     = new (window.AudioContext || window.webkitAudioContext)();
-      bgGain  = ctx.createGain(); bgGain.gain.value  = 0.35; bgGain.connect(ctx.destination);
-      sfxGain = ctx.createGain(); sfxGain.gain.value = 0.7;  sfxGain.connect(ctx.destination);
-      unlocked = true;
-      preload();
-    } catch (e) { /* silent mode */ }
+      ctx      = new (window.AudioContext || window.webkitAudioContext)();
+      sfxGain  = ctx.createGain();
+      sfxGain.gain.value = 0.65;
+      sfxGain.connect(ctx.destination);
+      sfxReady = true;
+      loadSFX();
+    } catch (e) { /* silent fallback */ }
   }
 
-  async function preload() {
-    const files = { bg:'assets/audio/background.mp3', click:'assets/audio/click.wav',
-                    correct:'assets/audio/correct.wav', wrong:'assets/audio/wrong.wav',
-                    reward:'assets/audio/reward.wav' };
+  async function loadSFX() {
+    const files = {
+      click:   'assets/audio/click.wav',
+      correct: 'assets/audio/correct.wav',
+      wrong:   'assets/audio/wrong.wav',
+      reward:  'assets/audio/reward.wav',
+    };
     for (const [k, path] of Object.entries(files)) {
       try {
         const res = await fetch(path);
         if (!res.ok) continue;
-        buffers[k] = await ctx.decodeAudioData(await res.arrayBuffer());
-      } catch (e) { /* file missing */ }
-    }
-    if (buffers.bg) {
-      bgMusic = ctx.createBufferSource();
-      bgMusic.buffer = buffers.bg; bgMusic.loop = true;
-      bgMusic.connect(bgGain); bgMusic.start(0);
+        sfxBufs[k] = await ctx.decodeAudioData(await res.arrayBuffer());
+      } catch (e) { /* missing file — skip */ }
     }
   }
 
   function playSFX(key) {
-    if (!unlocked || !ctx || !buffers[key]) return;
-    try { const s = ctx.createBufferSource(); s.buffer = buffers[key]; s.connect(sfxGain); s.start(0); }
-    catch (e) { /* ignore */ }
+    if (muted || !sfxReady || !ctx || !sfxBufs[key]) return;
+    try {
+      const src = ctx.createBufferSource();
+      src.buffer = sfxBufs[key];
+      src.connect(sfxGain);
+      src.start(0);
+    } catch (e) { /* ignore */ }
   }
 
-  return { unlock, playSFX };
+  /* Toggle mute for both BG and SFX */
+  function toggleMute() {
+    muted       = !muted;
+    bgEl.muted  = muted;
+    updateMuteBtn();
+  }
+
+  function updateMuteBtn() {
+    if (!muteBtn) return;
+    muteBtn.textContent   = muted ? '🔇' : '🎵';
+    muteBtn.title         = muted ? 'Nyalakan musik' : 'Matikan musik';
+    muteBtn.setAttribute('aria-label', muted ? 'Nyalakan musik' : 'Matikan musik');
+    muteBtn.classList.toggle('muted', muted);
+  }
+
+  /* Create & inject the mute button into the game wrapper */
+  function createMuteBtn() {
+    muteBtn = document.createElement('button');
+    muteBtn.id        = 'muteBtn';
+    muteBtn.className = 'mute-btn';
+    muteBtn.textContent = '🎵';
+    muteBtn.title       = 'Matikan musik';
+    muteBtn.setAttribute('aria-label', 'Matikan musik');
+    muteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMute();
+    });
+    document.getElementById('gameWrapper').appendChild(muteBtn);
+  }
+
+  /* Resume BG if tab becomes visible again */
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && !muted) bgEl.play().catch(() => {});
+  });
+
+  return { unlock, playSFX, createMuteBtn };
 })();
 
 
@@ -334,6 +396,9 @@ const Game = (() => {
   function init() {
     document.body.classList.add('loading');
     document.addEventListener('pointerdown', AudioManager.unlock, { once:true });
+
+    /* Create mute button */
+    AudioManager.createMuteBtn();
 
     const inp = $('playerNameInput');
     if (inp) inp.addEventListener('keydown', e => { if (e.key==='Enter') submitName(); });
