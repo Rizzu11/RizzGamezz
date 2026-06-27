@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#fce4ec" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>My Little Adventure ❤️</title>
+
+  <!-- Pixel font: Press Start 2P for headers, Nunito for readable body text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PARTICLE CANVAS — floating hearts & sparkles (behind all)
+  ═══════════════════════════════════════════════════════════════ -->
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCENE TRANSITION OVERLAY — full-screen fade black
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="transitionOverlay" aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MAIN GAME WRAPPER
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="gameWrapper">
+
+    <!-- ─────────────────────────────────────────────────────────
+         SCREEN 1 · TITLE SCREEN
+    ──────────────────────────────────────────────────────────── -->
+    <section id="screenTitle" class="screen active" role="main">
+
+      <!-- Background SVG: Night sky garden with stars & flowers -->
+      <div class="scene-bg" id="bgTitle" aria-hidden="true">
+        <svg viewBox="0 0 360 640" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <!-- Sky gradient -->
+          <defs>
+            <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1a0533"/>
+              <stop offset="60%" stop-color="#3d1266"/>
+              <stop offset="100%" stop-color="#7b3fa0"/>
+            </linearGradient>
+            <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#5a2d82"/>
+              <stop offset="100%" stop-color="#2d1040"/>
+            </linearGradient>
+            <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff9c4" stop-opacity="1"/>
+              <stop offset="60%" stop-color="#ffe082" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#ffe082" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Sky -->
+          <rect width="360" height="640" fill="url(#skyGrad)"/>
+
+          <!-- Moon glow halo -->
+          <circle cx="72" cy="90" r="55" fill="url(#moonGlow)" opacity="0.6"/>
+          <!-- Moon body -->
+          <circle cx="72" cy="90" r="30" fill="#fff9e6"/>
+          <!-- Moon craters (pixel dots) -->
+          <rect x="62" y="82" width="4" height="4" fill="#e8d070" opacity="0.5"/>
+          <rect x="78" y="94" width="6" height="6" fill="#e8d070" opacity="0.4"/>
+          <rect x="58" y="98" width="3" height="3" fill="#e8d070" opacity="0.3"/>
+
+          <!-- Stars (pixel style — 2x2 squares) -->
+          <rect x="20" y="30" width="2" height="2" fill="#fff" opacity="0.9"/>
+          <rect x="120" y="20" width="3" height="3" fill="#ffe082" opacity="0.8"/>
+          <rect x="200" y="45" width="2" height="2" fill="#fff" opacity="0.9"/>
+          <rect x="280" y="25" width="2" height="2" fill="#fff" opacity="0.7"/>
+          <rect x="320" y="60" width="3" height="3" fill="#ffe082" opacity="0.8"/>
+          <rect x="160" y="65" width="2" height="2" fill="#fff" opacity="0.6"/>
+          <rect x="240" y="110" width="2" height="2" fill="#fff" opacity="0.8"/>
+          <rect x="300" y="130" width="2" height="2" fill="#fff" opacity="0.7"/>
+          <rect x="40" y="150" width="2" height="2" fill="#ffe082" opacity="0.6"/>
+          <rect x="340" y="90" width="2" height="2" fill="#fff" opacity="0.9"/>
+          <rect x="180" y="130" width="2" height="2" fill="#fff" opacity="0.5"/>
+          <rect x="100" y="140" width="3" height="3" fill="#ffe082" opacity="0.7"/>
+
+          <!-- Ground -->
+          <rect x="0" y="480" width="360" height="160" fill="url(#groundGrad)"/>
+
+          <!-- Grass strips (pixel rows) -->
+          <rect x="0" y="476" width="360" height="8" fill="#4a9e4a"/>
+          <rect x="0" y="484" width="360" height="4" fill="#3a8c3a"/>
+
+          <!-- Left tree trunk -->
+          <rect x="18" y="340" width="16" height="140" fill="#5c3317"/>
+          <rect x="14" y="344" width="4" height="4" fill="#4a2a12"/>
+          <!-- Left tree foliage (layered pixel triangles) -->
+          <rect x="0" y="260" width="52" height="50" rx="4" fill="#2d7a2d"/>
+          <rect x="4" y="224" width="44" height="50" rx="4" fill="#3a9e3a"/>
+          <rect x="10" y="192" width="32" height="48" rx="4" fill="#4ab84a"/>
+          <rect x="16" y="168" width="20" height="36" rx="3" fill="#5cd45c"/>
+          <!-- Tree sparkles -->
+          <circle cx="52" cy="230" r="3" fill="#ffe082" filter="url(#glow)" opacity="0.9"/>
+          <circle cx="8" cy="270" r="2" fill="#ffe082" filter="url(#glow)" opacity="0.7"/>
+
+          <!-- Right tree trunk -->
+          <rect x="326" y="340" width="16" height="140" fill="#5c3317"/>
+          <!-- Right tree foliage -->
+          <rect x="308" y="260" width="52" height="50" rx="4" fill="#2d7a2d"/>
+          <rect x="312" y="224" width="44" height="50" rx="4" fill="#3a9e3a"/>
+          <rect x="318" y="192" width="32" height="48" rx="4" fill="#4ab84a"/>
+          <rect x="324" y="168" width="20" height="36" rx="3" fill="#5cd45c"/>
+          <circle cx="308" cy="230" r="3" fill="#ffe082" filter="url(#glow)" opacity="0.9"/>
+          <circle cx="352" cy="268" r="2" fill="#ffe082" filter="url(#glow)" opacity="0.7"/>
+
+          <!-- Pixel flowers on ground (left cluster) -->
+          <!-- Flower stems -->
+          <rect x="30" y="454" width="2" height="22" fill="#3a8c3a"/>
+          <rect x="48" y="458" width="2" height="18" fill="#3a8c3a"/>
+          <rect x="64" y="452" width="2" height="24" fill="#3a8c3a"/>
+          <!-- Flower heads pixel art -->
+          <rect x="26" y="446" width="10" height="10" rx="2" fill="#f48fb1"/>
+          <rect x="28" y="444" width="6" height="6" rx="1" fill="#fff" opacity="0.6"/>
+          <rect x="44" y="450" width="8" height="8" rx="2" fill="#f8bbd9"/>
+          <rect x="60" y="444" width="10" height="10" rx="2" fill="#f06292"/>
+          <rect x="62" y="442" width="6" height="6" rx="1" fill="#fff" opacity="0.4"/>
+
+          <!-- Pixel flowers on ground (right cluster) -->
+          <rect x="294" y="452" width="2" height="24" fill="#3a8c3a"/>
+          <rect x="310" y="458" width="2" height="18" fill="#3a8c3a"/>
+          <rect x="326" y="454" width="2" height="22" fill="#3a8c3a"/>
+          <rect x="290" y="444" width="10" height="10" rx="2" fill="#ce93d8"/>
+          <rect x="292" y="442" width="6" height="6" rx="1" fill="#fff" opacity="0.5"/>
+          <rect x="306" y="450" width="8" height="8" rx="2" fill="#ba68c8"/>
+          <rect x="322" y="444" width="10" height="10" rx="2" fill="#ab47bc"/>
+
+          <!-- Path (pixel stone walkway) -->
+          <rect x="140" y="476" width="80" height="164" fill="#8b6a8b" opacity="0.5"/>
+          <!-- Path stones -->
+          <rect x="148" y="490" width="28" height="14" rx="2" fill="#9c7a9c" opacity="0.6"/>
+          <rect x="184" y="490" width="28" height="14" rx="2" fill="#9c7a9c" opacity="0.6"/>
+          <rect x="152" y="512" width="24" height="14" rx="2" fill="#9c7a9c" opacity="0.5"/>
+          <rect x="184" y="512" width="24" height="14" rx="2" fill="#9c7a9c" opacity="0.5"/>
+
+          <!-- Floating magical orbs (title atmosphere) -->
+          <circle cx="170" cy="320" r="5" fill="#ffe082" filter="url(#glow)" opacity="0.7" class="orb-pulse"/>
+          <circle cx="220" cy="290" r="4" fill="#f8bbd9" filter="url(#glow)" opacity="0.8"/>
+          <circle cx="135" cy="350" r="3" fill="#b39ddb" filter="url(#glow)" opacity="0.9"/>
+          <circle cx="245" cy="360" r="4" fill="#80cbc4" filter="url(#glow)" opacity="0.6"/>
+
+          <!-- Title banner backdrop (dark stone plaque) -->
+          <rect x="20" y="190" width="320" height="90" rx="8" fill="#1a0533" opacity="0.7"/>
+          <rect x="24" y="194" width="312" height="82" rx="6" fill="none" stroke="#ffe082" stroke-width="2" opacity="0.6"/>
+          <!-- Corner pixel jewels -->
+          <rect x="20" y="190" width="8" height="8" fill="#ffe082"/>
+          <rect x="332" y="190" width="8" height="8" fill="#ffe082"/>
+          <rect x="20" y="274" width="8" height="8" fill="#ffe082"/>
+          <rect x="332" y="274" width="8" height="8" fill="#ffe082"/>
+        </svg>
+      </div>
+
+      <!-- Title UI Layer -->
+      <div class="screen-content title-content">
+        <div class="title-sparkle-row" aria-hidden="true">
+          <span class="sparkle">✨</span>
+          <span class="sparkle delay-1">⭐</span>
+          <span class="sparkle delay-2">✨</span>
+        </div>
+
+        <h1 class="game-title">
+          <span class="title-line-1">My Little</span>
+          <span class="title-line-2">Adventure</span>
+          <span class="title-heart">❤️</span>
+        </h1>
+
+        <p class="title-subtitle">— a gift just for you —</p>
+
+        <button id="btnStart" class="pixel-btn pixel-btn--primary" onclick="gameState.goToNameScreen()">
+          <span class="btn-icon">▶</span>
+          <span class="btn-text">Start</span>
+        </button>
+
+        <!-- Floating hearts row -->
+        <div class="floating-hearts-row" aria-hidden="true">
+          <span class="float-heart">💕</span>
+          <span class="float-heart delay-1">💖</span>
+          <span class="float-heart delay-2">💕</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────────
+         SCREEN 2 · NAME INPUT
+    ──────────────────────────────────────────────────────────── -->
+    <section id="screenNameInput" class="screen" role="main">
+
+      <!-- Background SVG: Soft dawn garden with morning glow -->
+      <div class="scene-bg" id="bgNameInput" aria-hidden="true">
+        <svg viewBox="0 0 360 640" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="dawnSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#fce4ec"/>
+              <stop offset="50%" stop-color="#f8bbd9"/>
+              <stop offset="100%" stop-color="#ffccbc"/>
+            </linearGradient>
+            <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff9c4"/>
+              <stop offset="100%" stop-color="#ffcc02" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Sky -->
+          <rect width="360" height="640" fill="url(#dawnSky)"/>
+
+          <!-- Sun glow -->
+          <circle cx="180" cy="130" r="70" fill="url(#sunGlow)" opacity="0.6"/>
+          <!-- Sun body (pixel square style) -->
+          <rect x="164" y="114" width="32" height="32" rx="4" fill="#ffe082"/>
+          <!-- Sun rays (pixel lines) -->
+          <rect x="178" y="94" width="4" height="16" fill="#ffd54f" opacity="0.7"/>
+          <rect x="178" y="150" width="4" height="16" fill="#ffd54f" opacity="0.7"/>
+          <rect x="144" y="128" width="16" height="4" fill="#ffd54f" opacity="0.7"/>
+          <rect x="200" y="128" width="16" height="4" fill="#ffd54f" opacity="0.7"/>
+          <rect x="152" y="102" width="12" height="4" transform="rotate(45 158 104)" fill="#ffd54f" opacity="0.5"/>
+          <rect x="200" y="102" width="12" height="4" transform="rotate(-45 206 104)" fill="#ffd54f" opacity="0.5"/>
+
+          <!-- Clouds (pixel fluffy) -->
+          <rect x="30" y="80" width="60" height="20" rx="10" fill="#fff" opacity="0.8"/>
+          <rect x="20" y="88" width="40" height="18" rx="9" fill="#fff" opacity="0.8"/>
+          <rect x="56" y="86" width="44" height="18" rx="9" fill="#fff" opacity="0.8"/>
+
+          <rect x="240" y="60" width="80" height="22" rx="11" fill="#fff" opacity="0.7"/>
+          <rect x="230" y="68" width="50" height="20" rx="10" fill="#fff" opacity="0.7"/>
+          <rect x="274" y="66" width="56" height="20" rx="10" fill="#fff" opacity="0.7"/>
+
+          <!-- Ground hill -->
+          <ellipse cx="180" cy="600" rx="250" ry="160" fill="#a5d6a7"/>
+          <rect x="0" y="520" width="360" height="120" fill="#81c784"/>
+          <rect x="0" y="516" width="360" height="8" fill="#66bb6a"/>
+
+          <!-- Pixel flowers scattered -->
+          <!-- Pink flowers -->
+          <rect x="20" y="498" width="2" height="20" fill="#4caf50"/>
+          <rect x="16" y="490" width="10" height="10" rx="5" fill="#f48fb1"/>
+          <rect x="50" y="502" width="2" height="16" fill="#4caf50"/>
+          <rect x="46" y="494" width="8" height="8" rx="4" fill="#f06292"/>
+          <!-- Yellow flowers -->
+          <rect x="85" y="496" width="2" height="22" fill="#4caf50"/>
+          <rect x="81" y="488" width="10" height="10" rx="5" fill="#fff176"/>
+          <rect x="83" y="490" width="4" height="4" fill="#ffa000"/>
+          <!-- Purple flowers -->
+          <rect x="270" y="500" width="2" height="18" fill="#4caf50"/>
+          <rect x="266" y="492" width="10" height="10" rx="5" fill="#ce93d8"/>
+          <rect x="300" y="496" width="2" height="22" fill="#4caf50"/>
+          <rect x="296" y="488" width="10" height="10" rx="5" fill="#ba68c8"/>
+          <rect x="330" y="502" width="2" height="16" fill="#4caf50"/>
+          <rect x="326" y="494" width="8" height="8" rx="4" fill="#ab47bc"/>
+
+          <!-- Pixel butterflies -->
+          <rect x="120" y="390" width="8" height="6" rx="2" fill="#f8bbd9" opacity="0.9"/>
+          <rect x="128" y="390" width="8" height="6" rx="2" fill="#f8bbd9" opacity="0.9"/>
+          <rect x="123" y="392" width="4" height="4" fill="#ad1457" opacity="0.5"/>
+
+          <rect x="230" y="420" width="8" height="6" rx="2" fill="#b3e5fc" opacity="0.9"/>
+          <rect x="238" y="420" width="8" height="6" rx="2" fill="#b3e5fc" opacity="0.9"/>
+          <rect x="233" y="422" width="4" height="4" fill="#0277bd" opacity="0.5"/>
+
+          <!-- Soft sparkle dots in sky -->
+          <circle cx="100" cy="180" r="3" fill="#ffe082" opacity="0.5"/>
+          <circle cx="260" cy="200" r="2" fill="#f8bbd9" opacity="0.6"/>
+          <circle cx="50" cy="250" r="2" fill="#ffe082" opacity="0.4"/>
+          <circle cx="310" cy="170" r="3" fill="#c5e1a5" opacity="0.5"/>
+        </svg>
+      </div>
+
+      <!-- Name Input UI -->
+      <div class="screen-content name-content">
+        <div class="dialogue-box name-dialogue-box">
+          <div class="dialogue-speaker" id="nameDialogueSpeaker">✿ Untukmu ✿</div>
+          <div class="dialogue-text" id="nameDialogueText"></div>
+        </div>
+
+        <div class="name-form-wrapper">
+          <label for="playerNameInput" class="name-label">Namaku adalah...</label>
+          <div class="name-input-row">
+            <input
+              type="text"
+              id="playerNameInput"
+              class="pixel-input"
+              placeholder="Tuliskan namamu ✨"
+              maxlength="20"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+            />
+          </div>
+          <button id="btnMulai" class="pixel-btn pixel-btn--primary" onclick="gameState.submitName()">
+            <span class="btn-icon">💖</span>
+            <span class="btn-text">Mulai</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────────
+         SCREEN 3 · STORY INTRO — Garden Gate
+    ──────────────────────────────────────────────────────────── -->
+    <section id="screenIntro" class="screen" role="main">
+
+      <!-- Background SVG: Magical garden gate entrance -->
+      <div class="scene-bg" id="bgIntro" aria-hidden="true">
+        <svg viewBox="0 0 360 640" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="introSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e8f5e9"/>
+              <stop offset="40%" stop-color="#c8e6c9"/>
+              <stop offset="100%" stop-color="#a5d6a7"/>
+            </linearGradient>
+            <linearGradient id="gateGold" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffe082"/>
+              <stop offset="100%" stop-color="#ffa000"/>
+            </linearGradient>
+            <radialGradient id="gateGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fffde7" stop-opacity="0.9"/>
+              <stop offset="100%" stop-color="#fffde7" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="softGlow">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Sky -->
+          <rect width="360" height="640" fill="url(#introSky)"/>
+
+          <!-- Distant hills -->
+          <ellipse cx="80" cy="420" rx="120" ry="80" fill="#81c784" opacity="0.6"/>
+          <ellipse cx="280" cy="430" rx="120" ry="80" fill="#66bb6a" opacity="0.5"/>
+
+          <!-- Ground -->
+          <rect x="0" y="440" width="360" height="200" fill="#4caf50"/>
+          <rect x="0" y="436" width="360" height="8" fill="#388e3c"/>
+
+          <!-- Stone path leading to gate -->
+          <rect x="145" y="440" width="70" height="200" fill="#78909c" opacity="0.4"/>
+          <!-- Individual path stones -->
+          <rect x="148" y="448" width="30" height="16" rx="3" fill="#90a4ae" opacity="0.7"/>
+          <rect x="182" y="448" width="30" height="16" rx="3" fill="#90a4ae" opacity="0.7"/>
+          <rect x="148" y="472" width="30" height="16" rx="3" fill="#90a4ae" opacity="0.6"/>
+          <rect x="182" y="472" width="30" height="16" rx="3" fill="#90a4ae" opacity="0.6"/>
+          <rect x="148" y="496" width="30" height="16" rx="3" fill="#90a4ae" opacity="0.5"/>
+          <rect x="182" y="496" width="30" height="16" rx="3" fill="#90a4ae" opacity="0.5"/>
+
+          <!-- Stone wall left -->
+          <rect x="0" y="300" width="120" height="140" fill="#8d6e63"/>
+          <!-- Brick pattern left -->
+          <rect x="0" y="300" width="58" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="62" y="300" width="58" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="0" y="322" width="38" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="42" y="322" width="38" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="84" y="322" width="36" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="0" y="344" width="58" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="62" y="344" width="58" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="0" y="366" width="40" height="18" rx="1" fill="#795548" opacity="0.4"/>
+          <rect x="44" y="366" width="40" height="18" rx="1" fill="#795548" opacity="0.4"/>
+          <rect x="88" y="366" width="32" height="18" rx="1" fill="#795548" opacity="0.4"/>
+          <rect x="0" y="388" width="58" height="18" rx="1" fill="#795548" opacity="0.4"/>
+          <rect x="62" y="388" width="58" height="18" rx="1" fill="#795548" opacity="0.4"/>
+
+          <!-- Stone wall right -->
+          <rect x="240" y="300" width="120" height="140" fill="#8d6e63"/>
+          <!-- Brick pattern right -->
+          <rect x="240" y="300" width="58" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="302" y="300" width="58" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="240" y="322" width="38" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="282" y="322" width="38" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="324" y="322" width="36" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="240" y="344" width="58" height="18" rx="1" fill="#795548" opacity="0.5"/>
+          <rect x="302" y="344" width="58" height="18" rx="1" fill="#795548" opacity="0.5"/>
+
+          <!-- Gate posts (left) -->
+          <rect x="110" y="200" width="28" height="240" fill="url(#gateGold)"/>
+          <rect x="106" y="196" width="36" height="12" rx="3" fill="#ffc107"/>
+          <rect x="104" y="188" width="40" height="12" rx="3" fill="#ffe082"/>
+          <!-- Gate post cap (pixel crown shape) -->
+          <rect x="108" y="174" width="8" height="16" fill="#ffe082"/>
+          <rect x="118" y="170" width="8" height="20" fill="#ffc107"/>
+          <rect x="128" y="174" width="8" height="16" fill="#ffe082"/>
+
+          <!-- Gate posts (right) -->
+          <rect x="222" y="200" width="28" height="240" fill="url(#gateGold)"/>
+          <rect x="218" y="196" width="36" height="12" rx="3" fill="#ffc107"/>
+          <rect x="216" y="188" width="40" height="12" rx="3" fill="#ffe082"/>
+          <rect x="220" y="174" width="8" height="16" fill="#ffe082"/>
+          <rect x="230" y="170" width="8" height="20" fill="#ffc107"/>
+          <rect x="240" y="174" width="8" height="16" fill="#ffe082"/>
+
+          <!-- Gate arch glow -->
+          <ellipse cx="180" cy="200" rx="90" ry="30" fill="url(#gateGlow)"/>
+
+          <!-- Gate arch (decorative pixel arch) -->
+          <path d="M 110 320 L 110 230 Q 110 180 180 180 Q 250 180 250 230 L 250 320" fill="none" stroke="#ffe082" stroke-width="6"/>
+          <path d="M 116 320 L 116 232 Q 116 188 180 188 Q 244 188 244 232 L 244 320" fill="none" stroke="#ffa000" stroke-width="2"/>
+
+          <!-- Gate bars (left panel) -->
+          <rect x="118" y="220" width="6" height="100" rx="3" fill="#ffe082"/>
+          <rect x="128" y="215" width="6" height="105" rx="3" fill="#ffc107"/>
+          <rect x="138" y="215" width="6" height="105" rx="3" fill="#ffc107"/>
+          <rect x="148" y="218" width="6" height="102" rx="3" fill="#ffe082"/>
+          <!-- Gate horizontal bars (left) -->
+          <rect x="118" y="240" width="42" height="5" rx="2" fill="#ffa000"/>
+          <rect x="118" y="280" width="42" height="5" rx="2" fill="#ffa000"/>
+          <rect x="118" y="310" width="42" height="5" rx="2" fill="#ffa000"/>
+
+          <!-- Gate bars (right panel) -->
+          <rect x="206" y="218" width="6" height="102" rx="3" fill="#ffe082"/>
+          <rect x="216" y="215" width="6" height="105" rx="3" fill="#ffc107"/>
+          <rect x="226" y="215" width="6" height="105" rx="3" fill="#ffc107"/>
+          <rect x="236" y="220" width="6" height="100" rx="3" fill="#ffe082"/>
+          <!-- Gate horizontal bars (right) -->
+          <rect x="200" y="240" width="42" height="5" rx="2" fill="#ffa000"/>
+          <rect x="200" y="280" width="42" height="5" rx="2" fill="#ffa000"/>
+          <rect x="200" y="310" width="42" height="5" rx="2" fill="#ffa000"/>
+
+          <!-- Rune symbols on gate (pixel characters) -->
+          <rect x="130" y="255" width="4" height="4" fill="#fff9c4"/>
+          <rect x="136" y="255" width="4" height="4" fill="#fff9c4"/>
+          <rect x="133" y="261" width="4" height="4" fill="#fff9c4"/>
+          <rect x="220" y="255" width="4" height="4" fill="#fff9c4"/>
+          <rect x="226" y="255" width="4" height="4" fill="#fff9c4"/>
+          <rect x="223" y="261" width="4" height="4" fill="#fff9c4"/>
+
+          <!-- Magical glow from behind gate (inside garden) -->
+          <rect x="162" y="182" width="36" height="138" fill="#fffde7" opacity="0.12"/>
+
+          <!-- Ivy vines on walls -->
+          <rect x="86" y="310" width="24" height="8" rx="4" fill="#558b2f" opacity="0.7"/>
+          <rect x="70" y="326" width="28" height="8" rx="4" fill="#689f38" opacity="0.7"/>
+          <rect x="90" y="342" width="20" height="8" rx="4" fill="#558b2f" opacity="0.6"/>
+          <rect x="60" y="358" width="24" height="8" rx="4" fill="#689f38" opacity="0.6"/>
+          <!-- Left ivy flowers -->
+          <circle cx="108" cy="318" r="5" fill="#f8bbd9" opacity="0.8"/>
+          <circle cx="90" cy="350" r="4" fill="#f48fb1" opacity="0.8"/>
+
+          <rect x="250" y="310" width="24" height="8" rx="4" fill="#558b2f" opacity="0.7"/>
+          <rect x="262" y="326" width="28" height="8" rx="4" fill="#689f38" opacity="0.7"/>
+          <rect x="248" y="342" width="20" height="8" rx="4" fill="#558b2f" opacity="0.6"/>
+          <circle cx="252" cy="318" r="5" fill="#ce93d8" opacity="0.8"/>
+          <circle cx="270" cy="350" r="4" fill="#ba68c8" opacity="0.8"/>
+
+          <!-- Magical orbs floating near gate -->
+          <circle cx="140" cy="200" r="6" fill="#ffe082" filter="url(#softGlow)" opacity="0.8"/>
+          <circle cx="220" cy="195" r="5" fill="#f8bbd9" filter="url(#softGlow)" opacity="0.9"/>
+          <circle cx="180" cy="165" r="7" fill="#c5cae9" filter="url(#softGlow)" opacity="0.7"/>
+
+          <!-- Trees behind walls -->
+          <rect x="0" y="200" width="22" height="240" fill="#4a2a12"/>
+          <rect x="0" y="120" width="80" height="100" rx="8" fill="#2e7d32"/>
+          <rect x="0" y="80" width="64" height="80" rx="6" fill="#388e3c"/>
+          <rect x="4" y="48" width="50" height="64" rx="5" fill="#43a047"/>
+
+          <rect x="338" y="200" width="22" height="240" fill="#4a2a12"/>
+          <rect x="280" y="120" width="80" height="100" rx="8" fill="#2e7d32"/>
+          <rect x="296" y="80" width="64" height="80" rx="6" fill="#388e3c"/>
+          <rect x="306" y="48" width="50" height="64" rx="5" fill="#43a047"/>
+        </svg>
+      </div>
+
+      <!-- Character sprite — cute chibi girl -->
+      <div class="character-sprite" id="characterIntro" aria-hidden="true">
+        <svg viewBox="0 0 56 80" xmlns="http://www.w3.org/2000/svg" width="56" height="80">
+          <!-- Hair back layer -->
+          <ellipse cx="28" cy="18" rx="18" ry="20" fill="#6d3b1e"/>
+          <!-- Two cute side pigtails -->
+          <ellipse cx="8"  cy="22" rx="7" ry="9"  fill="#6d3b1e"/>
+          <ellipse cx="48" cy="22" rx="7" ry="9"  fill="#6d3b1e"/>
+          <!-- Hair ribbons -->
+          <ellipse cx="8"  cy="14" rx="5" ry="3"  fill="#f48fb1"/>
+          <ellipse cx="48" cy="14" rx="5" ry="3"  fill="#f48fb1"/>
+          <circle  cx="8"  cy="14" r="2"           fill="#e91e63"/>
+          <circle  cx="48" cy="14" r="2"           fill="#e91e63"/>
+          <!-- Face — chubby round chibi -->
+          <ellipse cx="28" cy="26" rx="16" ry="17" fill="#ffccbc"/>
+          <!-- Hair front fringe -->
+          <ellipse cx="28" cy="12" rx="17" ry="8"  fill="#7d4726"/>
+          <ellipse cx="16" cy="14" rx="7"  ry="6"  fill="#7d4726"/>
+          <ellipse cx="40" cy="14" rx="7"  ry="6"  fill="#7d4726"/>
+          <!-- Big cute eyes (circles, not rects!) -->
+          <circle cx="21" cy="26" r="5" fill="#fff"/>
+          <circle cx="35" cy="26" r="5" fill="#fff"/>
+          <circle cx="21" cy="27" r="3.5" fill="#4e2a04"/>
+          <circle cx="35" cy="27" r="3.5" fill="#4e2a04"/>
+          <!-- Iris colour -->
+          <circle cx="21" cy="27" r="2.2" fill="#a0522d"/>
+          <circle cx="35" cy="27" r="2.2" fill="#a0522d"/>
+          <!-- Pupil -->
+          <circle cx="21" cy="27" r="1.2" fill="#1a0a00"/>
+          <circle cx="35" cy="27" r="1.2" fill="#1a0a00"/>
+          <!-- Eye sparkle highlights (big + small) -->
+          <circle cx="22.5" cy="25.5" r="1.3" fill="#fff"/>
+          <circle cx="36.5" cy="25.5" r="1.3" fill="#fff"/>
+          <circle cx="20"   cy="28.5" r="0.7" fill="#fff" opacity="0.8"/>
+          <circle cx="34"   cy="28.5" r="0.7" fill="#fff" opacity="0.8"/>
+          <!-- Eyelashes (top arcs) -->
+          <path d="M17 23 Q21 21 25 23" fill="none" stroke="#4e2a04" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M31 23 Q35 21 39 23" fill="none" stroke="#4e2a04" stroke-width="1.2" stroke-linecap="round"/>
+          <!-- Happy squint lines on eyes -->
+          <!-- Chubby rosy cheeks -->
+          <ellipse cx="13" cy="31" rx="6" ry="4" fill="#ffb3c1" opacity="0.55"/>
+          <ellipse cx="43" cy="31" rx="6" ry="4" fill="#ffb3c1" opacity="0.55"/>
+          <!-- Cute smile (curved path) -->
+          <path d="M22 34 Q28 39 34 34" fill="none" stroke="#e57373" stroke-width="2" stroke-linecap="round"/>
+          <!-- Little nose dot -->
+          <circle cx="28" cy="31" r="1.2" fill="#e8a090" opacity="0.7"/>
+          <!-- Neck -->
+          <rect x="23" y="42" width="10" height="6" rx="3" fill="#ffccbc"/>
+          <!-- Body — cute dress with collar -->
+          <rect x="10" y="46" width="36" height="26" rx="8" fill="#f48fb1"/>
+          <!-- Dress collar -->
+          <path d="M18 46 Q28 52 38 46" fill="#fff" opacity="0.7"/>
+          <!-- Dress waist ribbon -->
+          <rect x="10" y="58" width="36" height="5" rx="2" fill="#f06292" opacity="0.7"/>
+          <!-- Dress hem ruffle -->
+          <ellipse cx="28" cy="72" rx="20" ry="5" fill="#f06292"/>
+          <!-- Tiny star on dress -->
+          <text x="24" y="58" font-size="8" fill="#fff" opacity="0.8">⭐</text>
+          <!-- Arms (chubby rounded) -->
+          <ellipse cx="6"  cy="56" rx="5" ry="9" fill="#ffccbc"/>
+          <ellipse cx="50" cy="56" rx="5" ry="9" fill="#ffccbc"/>
+          <!-- Little hands waving -->
+          <circle cx="6"  cy="64" r="4.5" fill="#ffccbc"/>
+          <circle cx="50" cy="64" r="4.5" fill="#ffccbc"/>
+          <!-- Tiny feet & shoes -->
+          <ellipse cx="20" cy="77" rx="7" ry="4" fill="#7d4726"/>
+          <ellipse cx="36" cy="77" rx="7" ry="4" fill="#7d4726"/>
+          <!-- Shoe shine -->
+          <ellipse cx="18" cy="75" rx="3" ry="1.5" fill="#fff" opacity="0.3"/>
+          <ellipse cx="34" cy="75" rx="3" ry="1.5" fill="#fff" opacity="0.3"/>
+        </svg>
+      </div>
+
+      <!-- Dialogue Box -->
+      <div class="dialogue-overlay">
+        <div class="dialogue-box">
+          <div class="dialogue-speaker" id="introSpeaker">Narrator</div>
+          <div class="dialogue-text" id="introText"></div>
+          <button class="dialogue-next-btn" id="introNextBtn" aria-label="Next dialogue">▼ Next</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────────
+         SCREEN 4 · ENTERING THE GARDEN (transition scene)
+    ──────────────────────────────────────────────────────────── -->
+    <section id="screenEnter" class="screen" role="main">
+
+      <!-- Background SVG: Inside magical garden -->
+      <div class="scene-bg" id="bgEnter" aria-hidden="true">
+        <svg viewBox="0 0 360 640" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="magicSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e8eaf6"/>
+              <stop offset="50%" stop-color="#e1f5fe"/>
+              <stop offset="100%" stop-color="#b2ebf2"/>
+            </linearGradient>
+            <radialGradient id="magicGlow2" cx="50%" cy="30%" r="60%">
+              <stop offset="0%" stop-color="#fff9c4" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#fff9c4" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Magical sky -->
+          <rect width="360" height="640" fill="url(#magicSky)"/>
+          <rect width="360" height="640" fill="url(#magicGlow2)"/>
+
+          <!-- Rainbow arc (pixel style) -->
+          <path d="M 20 340 Q 180 80 340 340" fill="none" stroke="#ef9a9a" stroke-width="8" opacity="0.4"/>
+          <path d="M 20 340 Q 180 90 340 340" fill="none" stroke="#ffe082" stroke-width="6" opacity="0.4"/>
+          <path d="M 20 340 Q 180 100 340 340" fill="none" stroke="#a5d6a7" stroke-width="6" opacity="0.4"/>
+          <path d="M 20 340 Q 180 110 340 340" fill="none" stroke="#90caf9" stroke-width="6" opacity="0.4"/>
+          <path d="M 20 340 Q 180 120 340 340" fill="none" stroke="#ce93d8" stroke-width="6" opacity="0.4"/>
+
+          <!-- Ground -->
+          <rect x="0" y="460" width="360" height="180" fill="#66bb6a"/>
+          <rect x="0" y="455" width="360" height="10" fill="#4caf50"/>
+
+          <!-- Large magical flower left -->
+          <rect x="22" y="424" width="4" height="36" fill="#2e7d32"/>
+          <rect x="18" y="394" width="12" height="12" rx="6" fill="#f06292"/>
+          <rect x="28" y="394" width="12" height="12" rx="6" fill="#f06292"/>
+          <rect x="18" y="406" width="12" height="12" rx="6" fill="#f48fb1"/>
+          <rect x="28" y="406" width="12" height="12" rx="6" fill="#f48fb1"/>
+          <rect x="22" y="400" width="8" height="8" rx="4" fill="#ffe082"/>
+          <!-- Leaf -->
+          <rect x="10" y="432" width="16" height="8" rx="4" fill="#388e3c" transform="rotate(-20 18 436)"/>
+
+          <!-- Large magical flower right -->
+          <rect x="334" y="424" width="4" height="36" fill="#2e7d32"/>
+          <rect x="330" y="394" width="12" height="12" rx="6" fill="#ce93d8"/>
+          <rect x="340" y="394" width="12" height="12" rx="6" fill="#ce93d8"/>
+          <rect x="330" y="406" width="12" height="12" rx="6" fill="#ba68c8"/>
+          <rect x="340" y="406" width="12" height="12" rx="6" fill="#ba68c8"/>
+          <rect x="334" y="400" width="8" height="8" rx="4" fill="#ffe082"/>
+          <rect x="334" y="432" width="16" height="8" rx="4" fill="#388e3c" transform="rotate(20 342 436)"/>
+
+          <!-- Magical fountain base -->
+          <rect x="140" y="420" width="80" height="40" rx="8" fill="#90caf9" opacity="0.6"/>
+          <rect x="152" y="410" width="56" height="14" rx="7" fill="#b3e5fc" opacity="0.7"/>
+          <!-- Fountain center -->
+          <rect x="176" y="370" width="8" height="44" fill="#81d4fa"/>
+          <!-- Fountain water drops (pixel art) -->
+          <rect x="172" y="350" width="4" height="8" rx="2" fill="#b3e5fc" opacity="0.8"/>
+          <rect x="180" y="345" width="4" height="12" rx="2" fill="#b3e5fc" opacity="0.9"/>
+          <rect x="188" y="352" width="4" height="8" rx="2" fill="#b3e5fc" opacity="0.7"/>
+          <rect x="164" y="356" width="4" height="6" rx="2" fill="#b3e5fc" opacity="0.6"/>
+          <rect x="192" y="358" width="4" height="6" rx="2" fill="#b3e5fc" opacity="0.6"/>
+
+          <!-- Fireflies / magical lights -->
+          <circle cx="60" cy="300" r="4" fill="#ffe082" opacity="0.8" filter="url(#softGlow)"/>
+          <circle cx="90" cy="260" r="3" fill="#c5cae9" opacity="0.9"/>
+          <circle cx="290" cy="290" r="4" fill="#ffe082" opacity="0.7" filter="url(#softGlow)"/>
+          <circle cx="310" cy="250" r="3" fill="#f8bbd9" opacity="0.8"/>
+          <circle cx="180" cy="210" r="5" fill="#fffde7" opacity="0.6" filter="url(#softGlow)"/>
+          <circle cx="130" cy="340" r="3" fill="#b3e5fc" opacity="0.8"/>
+          <circle cx="240" cy="330" r="3" fill="#c8e6c9" opacity="0.8"/>
+
+          <!-- Mushrooms (pixel) -->
+          <rect x="64" y="444" width="4" height="14" fill="#efebe9"/>
+          <rect x="56" y="432" width="20" height="14" rx="5" fill="#ef5350"/>
+          <rect x="58" y="434" width="4" height="4" fill="#fff" opacity="0.6"/>
+          <rect x="66" y="432" width="4" height="4" fill="#fff" opacity="0.6"/>
+
+          <rect x="286" y="444" width="4" height="14" fill="#efebe9"/>
+          <rect x="278" y="432" width="20" height="14" rx="5" fill="#ec407a"/>
+          <rect x="280" y="434" width="4" height="4" fill="#fff" opacity="0.6"/>
+          <rect x="288" y="432" width="4" height="4" fill="#fff" opacity="0.6"/>
+
+          <!-- Pixel butterflies -->
+          <rect x="110" y="280" width="10" height="8" rx="3" fill="#f8bbd9"/>
+          <rect x="120" y="280" width="10" height="8" rx="3" fill="#f8bbd9"/>
+          <rect x="114" y="283" width="4" height="5" fill="#c2185b" opacity="0.4"/>
+
+          <rect x="230" y="250" width="10" height="8" rx="3" fill="#fff9c4"/>
+          <rect x="240" y="250" width="10" height="8" rx="3" fill="#fff9c4"/>
+          <rect x="234" y="253" width="4" height="5" fill="#f57f17" opacity="0.4"/>
+        </svg>
+      </div>
+
+      <!-- Character sprite entering — same chibi, one arm raised in wonder ✨ -->
+      <div class="character-sprite character-entering" id="characterEnter" aria-hidden="true">
+        <svg viewBox="0 0 56 80" xmlns="http://www.w3.org/2000/svg" width="56" height="80">
+          <!-- Hair back layer -->
+          <ellipse cx="28" cy="18" rx="18" ry="20" fill="#6d3b1e"/>
+          <!-- Pigtails -->
+          <ellipse cx="8"  cy="22" rx="7" ry="9" fill="#6d3b1e"/>
+          <ellipse cx="48" cy="22" rx="7" ry="9" fill="#6d3b1e"/>
+          <!-- Hair ribbons -->
+          <ellipse cx="8"  cy="14" rx="5" ry="3" fill="#f48fb1"/>
+          <ellipse cx="48" cy="14" rx="5" ry="3" fill="#f48fb1"/>
+          <circle  cx="8"  cy="14" r="2"          fill="#e91e63"/>
+          <circle  cx="48" cy="14" r="2"          fill="#e91e63"/>
+          <!-- Face -->
+          <ellipse cx="28" cy="26" rx="16" ry="17" fill="#ffccbc"/>
+          <!-- Hair fringe -->
+          <ellipse cx="28" cy="12" rx="17" ry="8"  fill="#7d4726"/>
+          <ellipse cx="16" cy="14" rx="7"  ry="6"  fill="#7d4726"/>
+          <ellipse cx="40" cy="14" rx="7"  ry="6"  fill="#7d4726"/>
+          <!-- Big round eyes with sparkle (UwU amazed look) -->
+          <circle cx="21" cy="26" r="5.5" fill="#fff"/>
+          <circle cx="35" cy="26" r="5.5" fill="#fff"/>
+          <circle cx="21" cy="27" r="4"   fill="#4e2a04"/>
+          <circle cx="35" cy="27" r="4"   fill="#4e2a04"/>
+          <circle cx="21" cy="27" r="2.5" fill="#a0522d"/>
+          <circle cx="35" cy="27" r="2.5" fill="#a0522d"/>
+          <circle cx="21" cy="27" r="1.4" fill="#1a0a00"/>
+          <circle cx="35" cy="27" r="1.4" fill="#1a0a00"/>
+          <!-- Big sparkle highlights (amazed eyes) -->
+          <circle cx="23"   cy="24.5" r="1.8" fill="#fff"/>
+          <circle cx="37"   cy="24.5" r="1.8" fill="#fff"/>
+          <circle cx="19.5" cy="28.5" r="0.9" fill="#fff" opacity="0.9"/>
+          <circle cx="33.5" cy="28.5" r="0.9" fill="#fff" opacity="0.9"/>
+          <!-- Eyelashes -->
+          <path d="M17 22.5 Q21 20.5 25 22.5" fill="none" stroke="#4e2a04" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M31 22.5 Q35 20.5 39 22.5" fill="none" stroke="#4e2a04" stroke-width="1.2" stroke-linecap="round"/>
+          <!-- Rosy cheeks (extra pink — she's excited!) -->
+          <ellipse cx="13" cy="31" rx="6.5" ry="4.5" fill="#ffb3c1" opacity="0.65"/>
+          <ellipse cx="43" cy="31" rx="6.5" ry="4.5" fill="#ffb3c1" opacity="0.65"/>
+          <!-- Open-mouth wow smile -->
+          <path d="M21 34 Q28 40 35 34" fill="#ffccbc" stroke="#e57373" stroke-width="1.8" stroke-linecap="round"/>
+          <ellipse cx="28" cy="36" rx="4" ry="2.5" fill="#e57373" opacity="0.5"/>
+          <!-- Nose dot -->
+          <circle cx="28" cy="31" r="1.2" fill="#e8a090" opacity="0.7"/>
+          <!-- Neck -->
+          <rect x="23" y="42" width="10" height="6" rx="3" fill="#ffccbc"/>
+          <!-- Dress -->
+          <rect x="10" y="46" width="36" height="26" rx="8" fill="#f48fb1"/>
+          <path d="M18 46 Q28 52 38 46" fill="#fff" opacity="0.7"/>
+          <rect x="10" y="58" width="36" height="5" rx="2" fill="#f06292" opacity="0.7"/>
+          <ellipse cx="28" cy="72" rx="20" ry="5" fill="#f06292"/>
+          <text x="24" y="58" font-size="8" fill="#fff" opacity="0.8">⭐</text>
+          <!-- Left arm normal -->
+          <ellipse cx="6"  cy="56" rx="5" ry="9" fill="#ffccbc"/>
+          <circle  cx="6"  cy="64" r="4.5"        fill="#ffccbc"/>
+          <!-- Right arm raised up in wonder! -->
+          <ellipse cx="51" cy="46" rx="5" ry="9" fill="#ffccbc" transform="rotate(-50 51 46)"/>
+          <circle  cx="54" cy="38" r="4.5"        fill="#ffccbc"/>
+          <!-- Little sparkle near raised hand -->
+          <text x="52" y="32" font-size="9" opacity="0.9">✨</text>
+          <!-- Feet & shoes -->
+          <ellipse cx="20" cy="77" rx="7" ry="4" fill="#7d4726"/>
+          <ellipse cx="36" cy="77" rx="7" ry="4" fill="#7d4726"/>
+          <ellipse cx="18" cy="75" rx="3" ry="1.5" fill="#fff" opacity="0.3"/>
+          <ellipse cx="34" cy="75" rx="3" ry="1.5" fill="#fff" opacity="0.3"/>
+        </svg>
+      </div>
+
+      <!-- Dialogue box -->
+      <div class="dialogue-overlay">
+        <div class="dialogue-box">
+          <div class="dialogue-speaker" id="enterSpeaker">Narrator</div>
+          <div class="dialogue-text" id="enterText"></div>
+          <button class="dialogue-next-btn" id="enterNextBtn" aria-label="Next dialogue">▼ Next</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────────
+         SCREEN 5 · QUIZ
+    ──────────────────────────────────────────────────────────── -->
+    <section id="screenQuiz" class="screen" role="main">
+
+      <!-- Background SVG: Forest clearing quiz area -->
+      <div class="scene-bg" id="bgQuiz" aria-hidden="true">
+        <svg viewBox="0 0 360 640" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="quizSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#fce4ec"/>
+              <stop offset="100%" stop-color="#ffd7e4"/>
+            </linearGradient>
+          </defs>
+
+          <rect width="360" height="640" fill="url(#quizSky)"/>
+
+          <!-- Ground -->
+          <rect x="0" y="440" width="360" height="200" fill="#81c784"/>
+          <rect x="0" y="435" width="360" height="10" fill="#66bb6a"/>
+
+          <!-- Left tree -->
+          <rect x="0" y="300" width="18" height="155" fill="#5c3317"/>
+          <rect x="0" y="180" width="72" height="130" rx="10" fill="#2e7d32"/>
+          <rect x="0" y="140" width="58" height="90" rx="8" fill="#388e3c"/>
+          <rect x="4" y="108" width="46" height="72" rx="6" fill="#43a047"/>
+          <!-- Tree sparkle -->
+          <circle cx="72" cy="200" r="4" fill="#ffe082" opacity="0.8"/>
+
+          <!-- Right tree -->
+          <rect x="342" y="300" width="18" height="155" fill="#5c3317"/>
+          <rect x="288" y="180" width="72" height="130" rx="10" fill="#2e7d32"/>
+          <rect x="302" y="140" width="58" height="90" rx="8" fill="#388e3c"/>
+          <rect x="310" y="108" width="46" height="72" rx="6" fill="#43a047"/>
+          <circle cx="288" cy="200" r="4" fill="#ffe082" opacity="0.8"/>
+
+          <!-- Clouds -->
+          <rect x="80" y="60" width="70" height="22" rx="11" fill="#fff" opacity="0.7"/>
+          <rect x="70" y="70" width="50" height="20" rx="10" fill="#fff" opacity="0.7"/>
+          <rect x="110" y="68" width="54" height="20" rx="10" fill="#fff" opacity="0.7"/>
+
+          <rect x="200" y="80" width="60" height="20" rx="10" fill="#fff" opacity="0.6"/>
+          <rect x="194" y="88" width="44" height="18" rx="9" fill="#fff" opacity="0.6"/>
+          <rect x="224" y="86" width="46" height="18" rx="9" fill="#fff" opacity="0.6"/>
+
+          <!-- Stone podium / platform for quiz -->
+          <rect x="90" y="400" width="180" height="40" rx="6" fill="#8d6e63"/>
+          <rect x="94" y="396" width="172" height="10" rx="4" fill="#a1887f"/>
+          <!-- Podium pixel decoration -->
+          <rect x="100" y="408" width="20" height="20" rx="2" fill="#795548" opacity="0.5"/>
+          <rect x="124" y="408" width="20" height="20" rx="2" fill="#795548" opacity="0.5"/>
+          <rect x="148" y="408" width="20" height="20" rx="2" fill="#795548" opacity="0.5"/>
+          <rect x="172" y="408" width="20" height="20" rx="2" fill="#795548" opacity="0.5"/>
+          <rect x="196" y="408" width="20" height="20" rx="2" fill="#795548" opacity="0.5"/>
+          <rect x="220" y="408" width="20" height="20" rx="2" fill="#795548" opacity="0.5"/>
+
+          <!-- Side flowers -->
+          <rect x="46" y="416" width="3" height="22" fill="#388e3c"/>
+          <rect x="42" y="408" width="10" height="10" rx="5" fill="#f06292"/>
+          <rect x="60" y="420" width="3" height="18" fill="#388e3c"/>
+          <rect x="56" y="412" width="10" height="10" rx="5" fill="#ab47bc"/>
+
+          <rect x="310" y="416" width="3" height="22" fill="#388e3c"/>
+          <rect x="306" y="408" width="10" height="10" rx="5" fill="#f06292"/>
+          <rect x="297" y="420" width="3" height="18" fill="#388e3c"/>
+          <rect x="293" y="412" width="10" height="10" rx="5" fill="#42a5f5"/>
+
+          <!-- Magical orbs / fireflies in trees -->
+          <circle cx="40" cy="280" r="4" fill="#ffe082" opacity="0.7"/>
+          <circle cx="320" cy="270" r="4" fill="#f8bbd9" opacity="0.7"/>
+          <circle cx="20" cy="330" r="3" fill="#c5cae9" opacity="0.8"/>
+          <circle cx="340" cy="320" r="3" fill="#c5cae9" opacity="0.8"/>
+        </svg>
+      </div>
+
+      <!-- Quiz UI -->
+      <div class="quiz-ui">
+        <!-- Progress indicator -->
+        <div class="quiz-progress">
+          <span class="progress-label">Soal</span>
+          <div class="progress-dots">
+            <span class="progress-dot" id="dot0">✦</span>
+            <span class="progress-dot" id="dot1">✦</span>
+            <span class="progress-dot" id="dot2">✦</span>
+          </div>
+        </div>
+
+        <!-- Question card -->
+        <div class="quiz-card" id="quizCard">
+          <div class="quiz-question-emoji" id="quizEmoji">🌸</div>
+          <p class="quiz-question-text" id="quizQuestionText"></p>
+        </div>
+
+        <!-- Answer buttons -->
+        <div class="quiz-answers" id="quizAnswers" role="group" aria-label="Pilihan jawaban">
+          <!-- Dynamically filled by script.js -->
+        </div>
+      </div>
+
+      <!-- Feedback overlay (shown after answering) -->
+      <div class="feedback-overlay" id="feedbackOverlay" aria-live="polite">
+        <div class="feedback-box" id="feedbackBox">
+          <div class="feedback-icon" id="feedbackIcon">✅</div>
+          <p class="feedback-text" id="feedbackText"></p>
+          <button class="pixel-btn pixel-btn--secondary" id="feedbackNextBtn">
+            <span class="btn-icon">▶</span>
+            <span class="btn-text">Lanjut ✨</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────────
+         SCREEN 6 · ENDING — Beautiful garden finish
+    ──────────────────────────────────────────────────────────── -->
+    <section id="screenEnding" class="screen" role="main">
+
+      <!-- Background SVG: Lush magical garden finale -->
+      <div class="scene-bg" id="bgEnding" aria-hidden="true">
+        <svg viewBox="0 0 360 640" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="endSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#fff9c4"/>
+              <stop offset="40%" stop-color="#ffe082"/>
+              <stop offset="100%" stop-color="#ffcc02"/>
+            </linearGradient>
+            <radialGradient id="endGlow" cx="50%" cy="20%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <rect width="360" height="640" fill="url(#endSky)"/>
+          <rect width="360" height="640" fill="url(#endGlow)"/>
+
+          <!-- Sunrays -->
+          <line x1="180" y1="0" x2="0" y2="300" stroke="#ffe082" stroke-width="40" opacity="0.15"/>
+          <line x1="180" y1="0" x2="360" y2="300" stroke="#ffe082" stroke-width="40" opacity="0.15"/>
+          <line x1="180" y1="0" x2="100" y2="400" stroke="#ffe082" stroke-width="20" opacity="0.1"/>
+          <line x1="180" y1="0" x2="260" y2="400" stroke="#ffe082" stroke-width="20" opacity="0.1"/>
+
+          <!-- Ground -->
+          <rect x="0" y="450" width="360" height="190" fill="#66bb6a"/>
+          <rect x="0" y="444" width="360" height="10" fill="#4caf50"/>
+
+          <!-- Big magical flower left -->
+          <rect x="30" y="390" width="6" height="60" fill="#2e7d32"/>
+          <rect x="20" y="354" width="18" height="18" rx="9" fill="#f48fb1"/>
+          <rect x="36" y="348" width="18" height="18" rx="9" fill="#e91e63"/>
+          <rect x="20" y="368" width="18" height="18" rx="9" fill="#f06292"/>
+          <rect x="36" y="368" width="18" height="18" rx="9" fill="#f48fb1"/>
+          <rect x="26" y="358" width="14" height="14" rx="7" fill="#ffe082"/>
+          <rect x="14" y="400" width="22" height="10" rx="5" fill="#388e3c" transform="rotate(-25 25 405)"/>
+          <rect x="38" y="402" width="22" height="10" rx="5" fill="#388e3c" transform="rotate(15 49 407)"/>
+
+          <!-- Big magical flower right -->
+          <rect x="324" y="390" width="6" height="60" fill="#2e7d32"/>
+          <rect x="314" y="354" width="18" height="18" rx="9" fill="#ce93d8"/>
+          <rect x="330" y="348" width="18" height="18" rx="9" fill="#9c27b0"/>
+          <rect x="314" y="368" width="18" height="18" rx="9" fill="#ba68c8"/>
+          <rect x="330" y="368" width="18" height="18" rx="9" fill="#ce93d8"/>
+          <rect x="320" y="358" width="14" height="14" rx="7" fill="#ffe082"/>
+          <rect x="308" y="400" width="22" height="10" rx="5" fill="#388e3c" transform="rotate(-15 319 405)"/>
+          <rect x="332" y="402" width="22" height="10" rx="5" fill="#388e3c" transform="rotate(25 343 407)"/>
+
+          <!-- Magical trees -->
+          <rect x="60" y="280" width="20" height="170" fill="#5c3317"/>
+          <rect x="30" y="160" width="80" height="130" rx="12" fill="#2e7d32"/>
+          <rect x="38" y="118" width="64" height="90" rx="10" fill="#388e3c"/>
+          <rect x="48" y="80" width="44" height="72" rx="8" fill="#43a047"/>
+          <rect x="58" y="52" width="24" height="42" rx="5" fill="#66bb6a"/>
+          <!-- Tree bloom flowers -->
+          <circle cx="30" cy="170" r="8" fill="#f48fb1" opacity="0.7"/>
+          <circle cx="110" cy="165" r="7" fill="#f8bbd9" opacity="0.7"/>
+          <circle cx="70" cy="125" r="6" fill="#ffe082" opacity="0.6"/>
+
+          <rect x="280" y="280" width="20" height="170" fill="#5c3317"/>
+          <rect x="250" y="160" width="80" height="130" rx="12" fill="#2e7d32"/>
+          <rect x="258" y="118" width="64" height="90" rx="10" fill="#388e3c"/>
+          <rect x="268" y="80" width="44" height="72" rx="8" fill="#43a047"/>
+          <rect x="278" y="52" width="24" height="42" rx="5" fill="#66bb6a"/>
+          <circle cx="250" cy="170" r="8" fill="#ce93d8" opacity="0.7"/>
+          <circle cx="330" cy="165" r="7" fill="#ba68c8" opacity="0.7"/>
+          <circle cx="290" cy="125" r="6" fill="#ffe082" opacity="0.6"/>
+
+          <!-- Confetti dots -->
+          <rect x="100" y="100" width="6" height="6" rx="1" fill="#ef9a9a" opacity="0.8"/>
+          <rect x="140" y="80" width="5" height="5" rx="1" fill="#ffe082" opacity="0.8"/>
+          <rect x="200" y="90" width="6" height="6" rx="1" fill="#a5d6a7" opacity="0.8"/>
+          <rect x="250" y="70" width="5" height="5" rx="1" fill="#90caf9" opacity="0.8"/>
+          <rect x="290" y="100" width="6" height="6" rx="1" fill="#ce93d8" opacity="0.8"/>
+          <rect x="120" y="140" width="4" height="4" rx="1" fill="#f48fb1" opacity="0.7"/>
+          <rect x="230" y="130" width="4" height="4" rx="1" fill="#ffe082" opacity="0.7"/>
+
+          <!-- Floating hearts in sky -->
+          <text x="158" y="50" font-size="16" opacity="0.6">💖</text>
+          <text x="50" y="220" font-size="12" opacity="0.5">✨</text>
+          <text x="300" y="200" font-size="12" opacity="0.5">✨</text>
+          <text x="188" y="165" font-size="14" opacity="0.4">⭐</text>
+
+          <!-- Path -->
+          <rect x="150" y="450" width="60" height="190" fill="#8bc34a" opacity="0.3"/>
+          <rect x="154" y="458" width="24" height="14" rx="3" fill="#9ccc65" opacity="0.4"/>
+          <rect x="182" y="458" width="24" height="14" rx="3" fill="#9ccc65" opacity="0.4"/>
+        </svg>
+      </div>
+
+      <!-- Ending UI -->
+      <div class="ending-ui">
+        <div class="dialogue-box ending-dialogue">
+          <div class="dialogue-speaker" id="endingSpeaker">🌸 Selamat 🌸</div>
+          <div class="dialogue-text" id="endingText"></div>
+          <button class="dialogue-next-btn" id="endingNextBtn" aria-label="Lanjut ke hadiah">▼ Lanjut</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────────
+         SCREEN 7 · REWARD — Treasure chests
+    ──────────────────────────────────────────────────────────── -->
+    <section id="screenReward" class="screen" role="main">
+
+      <!-- Background SVG: Treasure chamber -->
+      <div class="scene-bg" id="bgReward" aria-hidden="true">
+        <svg viewBox="0 0 360 640" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="chamberBg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1a0533"/>
+              <stop offset="50%" stop-color="#4a148c"/>
+              <stop offset="100%" stop-color="#311b92"/>
+            </linearGradient>
+            <radialGradient id="chamberGlow" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#ffe082" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#ffe082" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <rect width="360" height="640" fill="url(#chamberBg)"/>
+          <rect width="360" height="640" fill="url(#chamberGlow)"/>
+
+          <!-- Chamber floor -->
+          <rect x="0" y="480" width="360" height="160" fill="#1a0533"/>
+          <rect x="0" y="475" width="360" height="10" fill="#4a148c" opacity="0.8"/>
+          <!-- Floor tiles (pixel grid) -->
+          <rect x="0" y="480" width="60" height="40" fill="#311b92" opacity="0.4"/>
+          <rect x="60" y="480" width="60" height="40" fill="#1a0533" opacity="0.4"/>
+          <rect x="120" y="480" width="60" height="40" fill="#311b92" opacity="0.4"/>
+          <rect x="180" y="480" width="60" height="40" fill="#1a0533" opacity="0.4"/>
+          <rect x="240" y="480" width="60" height="40" fill="#311b92" opacity="0.4"/>
+          <rect x="300" y="480" width="60" height="40" fill="#1a0533" opacity="0.4"/>
+          <rect x="0" y="520" width="60" height="40" fill="#1a0533" opacity="0.4"/>
+          <rect x="60" y="520" width="60" height="40" fill="#311b92" opacity="0.4"/>
+          <rect x="120" y="520" width="60" height="40" fill="#1a0533" opacity="0.4"/>
+          <rect x="180" y="520" width="60" height="40" fill="#311b92" opacity="0.4"/>
+          <rect x="240" y="520" width="60" height="40" fill="#1a0533" opacity="0.4"/>
+          <rect x="300" y="520" width="60" height="40" fill="#311b92" opacity="0.4"/>
+
+          <!-- Chamber walls (stone blocks) -->
+          <!-- Left wall -->
+          <rect x="0" y="0" width="60" height="480" fill="#2d1040"/>
+          <rect x="0" y="0" width="56" height="30" rx="1" fill="#3d1466" opacity="0.5"/>
+          <rect x="0" y="34" width="56" height="30" rx="1" fill="#4a1a7c" opacity="0.4"/>
+          <rect x="0" y="68" width="56" height="30" rx="1" fill="#3d1466" opacity="0.5"/>
+          <rect x="0" y="102" width="56" height="30" rx="1" fill="#4a1a7c" opacity="0.4"/>
+          <!-- Wall torch left -->
+          <rect x="40" y="180" width="8" height="20" rx="2" fill="#8d6e63"/>
+          <rect x="36" y="172" width="16" height="12" rx="3" fill="#ffa000"/>
+          <rect x="38" y="164" width="12" height="12" rx="3" fill="#ff6f00"/>
+          <rect x="40" y="158" width="8" height="10" rx="2" fill="#ffe082"/>
+          <!-- Torch glow -->
+          <circle cx="44" cy="168" r="16" fill="#ffe082" opacity="0.15"/>
+
+          <!-- Right wall -->
+          <rect x="300" y="0" width="60" height="480" fill="#2d1040"/>
+          <rect x="304" y="0" width="56" height="30" rx="1" fill="#3d1466" opacity="0.5"/>
+          <rect x="304" y="34" width="56" height="30" rx="1" fill="#4a1a7c" opacity="0.4"/>
+          <rect x="304" y="68" width="56" height="30" rx="1" fill="#3d1466" opacity="0.5"/>
+          <!-- Wall torch right -->
+          <rect x="312" y="180" width="8" height="20" rx="2" fill="#8d6e63"/>
+          <rect x="308" y="172" width="16" height="12" rx="3" fill="#ffa000"/>
+          <rect x="310" y="164" width="12" height="12" rx="3" fill="#ff6f00"/>
+          <rect x="312" y="158" width="8" height="10" rx="2" fill="#ffe082"/>
+          <circle cx="316" cy="168" r="16" fill="#ffe082" opacity="0.15"/>
+
+          <!-- Ceiling arch (pixel) -->
+          <rect x="60" y="0" width="240" height="20" fill="#2d1040"/>
+          <path d="M 60 0 L 60 60 Q 60 120 180 140 Q 300 120 300 60 L 300 0" fill="#1a0533"/>
+
+          <!-- Stars/gems on ceiling -->
+          <rect x="120" y="30" width="6" height="6" rx="1" fill="#ffe082" opacity="0.7"/>
+          <rect x="170" y="20" width="8" height="8" rx="2" fill="#f8bbd9" opacity="0.8"/>
+          <rect x="230" y="34" width="6" height="6" rx="1" fill="#b3e5fc" opacity="0.7"/>
+          <rect x="150" y="48" width="5" height="5" rx="1" fill="#c5cae9" opacity="0.6"/>
+          <rect x="200" y="42" width="5" height="5" rx="1" fill="#ffe082" opacity="0.6"/>
+
+          <!-- Platform for chests -->
+          <rect x="60" y="430" width="240" height="50" rx="6" fill="#4a148c"/>
+          <rect x="64" y="426" width="232" height="10" rx="4" fill="#7b1fa2"/>
+          <!-- Platform gems / pixel decorations -->
+          <rect x="76" y="436" width="10" height="10" rx="2" fill="#ffe082"/>
+          <rect x="170" y="436" width="20" height="10" rx="2" fill="#f8bbd9"/>
+          <rect x="274" y="436" width="10" height="10" rx="2" fill="#ffe082"/>
+
+          <!-- Sparkles around the chest area -->
+          <text x="80" y="380" font-size="14" opacity="0.6">✨</text>
+          <text x="254" y="375" font-size="14" opacity="0.6">✨</text>
+          <text x="165" y="340" font-size="16" opacity="0.5">⭐</text>
+        </svg>
+      </div>
+
+      <!-- Reward UI: 3 mystery chests + prompt text -->
+      <div class="reward-ui">
+        <div class="reward-prompt">
+          <p class="reward-prompt-text" id="rewardPromptText">Pilih hadiahmu! 🎁</p>
+        </div>
+
+        <div class="chests-row chests-row--three">
+
+          <!-- Chest 1 — mystery, no hint -->
+          <div class="chest-wrapper" id="chest1Wrapper">
+            <button class="chest-btn" id="chest1Btn" onclick="gameState.openChest(1)" aria-label="Buka peti hadiah 1">
+              <svg class="chest-svg" id="chest1Svg" viewBox="0 0 80 70" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="32" width="72" height="34" rx="4" fill="#8d5524"/>
+                <rect x="4" y="32" width="72" height="6"  fill="#6d4019"/>
+                <rect x="4" y="8"  width="72" height="26" rx="4" fill="#a0522d"/>
+                <rect x="4" y="8"  width="72" height="6"  rx="2" fill="#cd853f"/>
+                <rect x="2" y="6"  width="76" height="6"  rx="2" fill="#ffc107"/>
+                <rect x="2" y="30" width="76" height="8"  rx="2" fill="#ffc107"/>
+                <rect x="4"  y="8" width="10" height="54" rx="2" fill="#ffa000" opacity="0.5"/>
+                <rect x="66" y="8" width="10" height="54" rx="2" fill="#ffa000" opacity="0.5"/>
+                <rect x="33" y="28" width="14" height="14" rx="3" fill="#ffd54f"/>
+                <rect x="36" y="24" width="8"  height="8"  rx="4" fill="none" stroke="#ffc107" stroke-width="3"/>
+                <rect x="12" y="12" width="16" height="4"  rx="2" fill="#fff" opacity="0.2"/>
+                <!-- Mystery question mark — no spoiler -->
+                <text x="40" y="57" font-family="'Press Start 2P',monospace" font-size="16" fill="#ffe082" text-anchor="middle" opacity="0.9">?</text>
+              </svg>
+            </button>
+            <p class="chest-label">Peti #1</p>
+          </div>
+
+          <!-- Chest 2 — mystery -->
+          <div class="chest-wrapper" id="chest2Wrapper">
+            <button class="chest-btn" id="chest2Btn" onclick="gameState.openChest(2)" aria-label="Buka peti hadiah 2">
+              <svg class="chest-svg" id="chest2Svg" viewBox="0 0 80 70" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="32" width="72" height="34" rx="4" fill="#7b3f20"/>
+                <rect x="4" y="32" width="72" height="6"  fill="#5c2e15"/>
+                <rect x="4" y="8"  width="72" height="26" rx="4" fill="#8b4513"/>
+                <rect x="4" y="8"  width="72" height="6"  rx="2" fill="#b8600a"/>
+                <rect x="2" y="6"  width="76" height="6"  rx="2" fill="#e91e63"/>
+                <rect x="2" y="30" width="76" height="8"  rx="2" fill="#e91e63"/>
+                <rect x="4"  y="8" width="10" height="54" rx="2" fill="#c2185b" opacity="0.5"/>
+                <rect x="66" y="8" width="10" height="54" rx="2" fill="#c2185b" opacity="0.5"/>
+                <rect x="33" y="28" width="14" height="14" rx="3" fill="#f48fb1"/>
+                <rect x="36" y="24" width="8"  height="8"  rx="4" fill="none" stroke="#e91e63" stroke-width="3"/>
+                <rect x="12" y="12" width="16" height="4"  rx="2" fill="#fff" opacity="0.2"/>
+                <text x="40" y="57" font-family="'Press Start 2P',monospace" font-size="16" fill="#fff" text-anchor="middle" opacity="0.9">?</text>
+              </svg>
+            </button>
+            <p class="chest-label">Peti #2</p>
+          </div>
+
+          <!-- Chest 3 — mystery -->
+          <div class="chest-wrapper" id="chest3Wrapper">
+            <button class="chest-btn" id="chest3Btn" onclick="gameState.openChest(3)" aria-label="Buka peti hadiah 3">
+              <svg class="chest-svg" id="chest3Svg" viewBox="0 0 80 70" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="32" width="72" height="34" rx="4" fill="#4a2a6e"/>
+                <rect x="4" y="32" width="72" height="6"  fill="#321a50"/>
+                <rect x="4" y="8"  width="72" height="26" rx="4" fill="#5e3587"/>
+                <rect x="4" y="8"  width="72" height="6"  rx="2" fill="#7b47a3"/>
+                <rect x="2" y="6"  width="76" height="6"  rx="2" fill="#ce93d8"/>
+                <rect x="2" y="30" width="76" height="8"  rx="2" fill="#ce93d8"/>
+                <rect x="4"  y="8" width="10" height="54" rx="2" fill="#ab47bc" opacity="0.5"/>
+                <rect x="66" y="8" width="10" height="54" rx="2" fill="#ab47bc" opacity="0.5"/>
+                <rect x="33" y="28" width="14" height="14" rx="3" fill="#e1bee7"/>
+                <rect x="36" y="24" width="8"  height="8"  rx="4" fill="none" stroke="#ce93d8" stroke-width="3"/>
+                <rect x="12" y="12" width="16" height="4"  rx="2" fill="#fff" opacity="0.2"/>
+                <text x="40" y="57" font-family="'Press Start 2P',monospace" font-size="16" fill="#ffe082" text-anchor="middle" opacity="0.9">?</text>
+              </svg>
+            </button>
+            <p class="chest-label">Peti #3</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Coupon reveal overlay -->
+      <div class="coupon-overlay" id="couponOverlay">
+        <div class="coupon-box" id="couponBox">
+          <div class="coupon-sparkles" aria-hidden="true">✨ 🎉 ✨</div>
+          <div class="coupon-icon" id="couponIcon">🎁</div>
+          <h2 class="coupon-title">Selamat!</h2>
+          <div class="coupon-card" id="couponCard">
+            <p class="coupon-value" id="couponValue">Dimsum Mentai Isi 8</p>
+          </div>
+          <p class="coupon-message" id="couponMessage">Horeee ❤️ Kamu bisa tukarin ke Hariz yaa 🥹✨</p>
+          <button class="pixel-btn pixel-btn--gold" id="couponCloseBtn" onclick="gameState.finishGame()">
+            <span class="btn-icon">💖</span>
+            <span class="btn-text">Makasih! ❤️</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────────────────────
+         SCREEN 8 · FINAL SCREEN
+    ──────────────────────────────────────────────────────────── -->
+    <section id="screenFinal" class="screen" role="main">
+      <div class="scene-bg" id="bgFinal" aria-hidden="true">
+        <svg viewBox="0 0 360 640" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <radialGradient id="finalGlow" cx="50%" cy="50%" r="70%">
+              <stop offset="0%" stop-color="#fff9c4"/>
+              <stop offset="50%" stop-color="#fce4ec"/>
+              <stop offset="100%" stop-color="#e8eaf6"/>
+            </radialGradient>
+          </defs>
+          <rect width="360" height="640" fill="url(#finalGlow)"/>
+          <!-- Lots of floating hearts and stars in the background -->
+          <text x="30" y="80" font-size="24" opacity="0.3">💕</text>
+          <text x="290" y="60" font-size="20" opacity="0.3">💖</text>
+          <text x="160" y="40" font-size="18" opacity="0.25">⭐</text>
+          <text x="60" y="160" font-size="16" opacity="0.2">✨</text>
+          <text x="280" y="180" font-size="16" opacity="0.2">✨</text>
+          <text x="10" y="300" font-size="20" opacity="0.15">💕</text>
+          <text x="320" y="280" font-size="20" opacity="0.15">💖</text>
+          <text x="140" y="500" font-size="22" opacity="0.2">🌸</text>
+          <text x="200" y="480" font-size="18" opacity="0.2">🌸</text>
+          <text x="80" y="540" font-size="16" opacity="0.15">💐</text>
+          <text x="250" y="560" font-size="16" opacity="0.15">💐</text>
+        </svg>
+      </div>
+
+      <div class="final-content">
+
+        <!-- Animated heart -->
+        <div class="final-heart-anim" aria-hidden="true">💖</div>
+
+        <!-- Dynamic title (player name) -->
+        <h2 class="final-title" id="finalTitle">Untuk Kamu ❤️</h2>
+
+        <!-- Love affirmations — cycled by JS -->
+        <div class="affirmation-card">
+          <p class="final-message" id="finalMessage"></p>
+        </div>
+
+        <!-- Bouquet — revealed on final affirmation -->
+        <div class="final-bouquet" id="finalBouquet" aria-label="Buket bunga untukmu" style="display:none;">
+          <svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" width="160" height="200">
+            <defs>
+              <radialGradient id="bqGlow" cx="50%" cy="50%" r="60%">
+                <stop offset="0%" stop-color="#fff9c4" stop-opacity="0.7"/>
+                <stop offset="100%" stop-color="#fff9c4" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Glow behind bouquet -->
+            <ellipse cx="80" cy="110" rx="65" ry="70" fill="url(#bqGlow)"/>
+
+            <!-- Wrapping paper (pixel cone) -->
+            <polygon points="45,175 115,175 100,120 60,120" fill="#f8bbd9"/>
+            <polygon points="50,175 80,175 65,120 45,130" fill="#f48fb1" opacity="0.6"/>
+            <polygon points="80,175 110,175 105,125 80,130" fill="#f06292" opacity="0.4"/>
+            <!-- Ribbon bow -->
+            <ellipse cx="80" cy="121" rx="18" ry="8" fill="#e91e63" opacity="0.7"/>
+            <ellipse cx="62" cy="116" rx="12" ry="7" fill="#e91e63" transform="rotate(-30 62 116)"/>
+            <ellipse cx="98" cy="116" rx="12" ry="7" fill="#e91e63" transform="rotate(30 98 116)"/>
+            <circle cx="80" cy="120" r="6" fill="#c2185b"/>
+
+            <!-- Stems -->
+            <line x1="80"  y1="120" x2="68"  y2="60" stroke="#388e3c" stroke-width="3"/>
+            <line x1="80"  y1="120" x2="80"  y2="50" stroke="#388e3c" stroke-width="3"/>
+            <line x1="80"  y1="120" x2="92"  y2="60" stroke="#388e3c" stroke-width="3"/>
+            <line x1="80"  y1="120" x2="56"  y2="72" stroke="#388e3c" stroke-width="2"/>
+            <line x1="80"  y1="120" x2="104" y2="72" stroke="#388e3c" stroke-width="2"/>
+            <line x1="80"  y1="120" x2="48"  y2="88" stroke="#2e7d32" stroke-width="2"/>
+            <line x1="80"  y1="120" x2="112" y2="88" stroke="#2e7d32" stroke-width="2"/>
+
+            <!-- Leaves -->
+            <ellipse cx="60" cy="94" rx="12" ry="6" fill="#43a047" transform="rotate(-40 60 94)"/>
+            <ellipse cx="100" cy="94" rx="12" ry="6" fill="#388e3c" transform="rotate(40 100 94)"/>
+            <ellipse cx="72" cy="78" rx="10" ry="5" fill="#4caf50" transform="rotate(-20 72 78)"/>
+            <ellipse cx="90" cy="76" rx="10" ry="5" fill="#43a047" transform="rotate(25 90 76)"/>
+
+            <!-- Big pink rose (center) -->
+            <circle cx="80" cy="48" r="16" fill="#f06292"/>
+            <circle cx="74" cy="44" r="11" fill="#f48fb1"/>
+            <circle cx="84" cy="42" r="9" fill="#fce4ec"/>
+            <circle cx="78" cy="46" r="7" fill="#f48fb1"/>
+            <circle cx="82" cy="44" r="5" fill="#e91e63"/>
+            <circle cx="80" cy="42" r="3" fill="#fff" opacity="0.4"/>
+
+            <!-- Left purple flower -->
+            <circle cx="56" cy="68" r="12" fill="#ce93d8"/>
+            <circle cx="52" cy="64" r="8"  fill="#ba68c8"/>
+            <circle cx="58" cy="62" r="6"  fill="#e1bee7"/>
+            <circle cx="55" cy="66" r="4"  fill="#ab47bc"/>
+            <circle cx="56" cy="64" r="2"  fill="#ffe082"/>
+
+            <!-- Right red flower -->
+            <circle cx="104" cy="68" r="12" fill="#ef9a9a"/>
+            <circle cx="100" cy="64" r="8"  fill="#e57373"/>
+            <circle cx="106" cy="62" r="6"  fill="#ffcdd2"/>
+            <circle cx="103" cy="66" r="4"  fill="#f44336"/>
+            <circle cx="104" cy="64" r="2"  fill="#ffe082"/>
+
+            <!-- Far left yellow flower -->
+            <circle cx="46" cy="86" r="10" fill="#fff176"/>
+            <circle cx="44" cy="82" r="6"  fill="#ffee58"/>
+            <circle cx="48" cy="80" r="5"  fill="#fffde7"/>
+            <circle cx="46" cy="84" r="3"  fill="#fdd835"/>
+            <circle cx="46" cy="82" r="2"  fill="#ff8f00"/>
+
+            <!-- Far right blue flower -->
+            <circle cx="114" cy="86" r="10" fill="#90caf9"/>
+            <circle cx="112" cy="82" r="6"  fill="#64b5f6"/>
+            <circle cx="116" cy="80" r="5"  fill="#e3f2fd"/>
+            <circle cx="114" cy="84" r="3"  fill="#1976d2"/>
+            <circle cx="114" cy="82" r="2"  fill="#ffe082"/>
+
+            <!-- Sparkles on flowers -->
+            <text x="70"  y="30" font-size="10" opacity="0.9">✨</text>
+            <text x="88"  y="28" font-size="8"  opacity="0.8">⭐</text>
+            <text x="106" y="52" font-size="8"  opacity="0.7">✨</text>
+            <text x="40"  y="60" font-size="8"  opacity="0.7">✨</text>
+          </svg>
+          <p class="bouquet-label">🌸 Buket Bunga Untukmu 🌸</p>
+        </div>
+
+        <!-- Flower row decoration -->
+        <div class="final-flowers" aria-hidden="true">🌸 🌺 🌸</div>
+
+        <button class="pixel-btn pixel-btn--primary" id="btnPlayAgain" onclick="gameState.restart()">
+          <span class="btn-icon">↺</span>
+          <span class="btn-text">Main Lagi ❤️</span>
+        </button>
+      </div>
+    </section>
+
+  </div><!-- /#gameWrapper -->
+
+  <script src="script.js"></script>
+</body>
+</html>
